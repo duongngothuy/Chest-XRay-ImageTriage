@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chest X-Ray Image Triage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+  /* Look and feel adapted from TemplateMo 622 Clearwave
+     (https://templatemo.com/tm-622-clearwave, free for personal and
+     commercial use). Only the pieces this app needs are kept. */
+  :root {
+    --bg:            #E8F4F2;
+    --surface-2:     #FFFFFF;
+    --accent:        #1A7A6E;
+    --accent-mid:    #2A9D8F;
+    --accent-ghost:  rgba(26,122,110,0.08);
+    --accent-border: rgba(26,122,110,0.15);
+    --danger:        #B3402A;
+    --danger-ghost:  rgba(179,64,42,0.08);
+    --text-1:        #0D1E1C;
+    --text-2:        #3A5C58;
+    --text-3:        #6B8C88;
+    --border:        rgba(13,30,28,0.08);
+    --shadow-sm:     0 2px 12px rgba(13,30,28,0.06);
+    --radius:        16px;
+    --radius-lg:     24px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+
+  .nav {
+    background: rgba(232,244,242,0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+  }
+  .nav-logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.04em; color: var(--text-1); }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-links a {
+    font-size: 0.9rem; font-weight: 500; color: var(--text-2);
+    padding: 7px 16px; border-radius: 100px;
+    transition: color 0.3s, background 0.3s, box-shadow 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); background: var(--accent-ghost); }
+  .nav-links a.active {
+    color: var(--accent);
+    background: var(--accent-ghost);
+    box-shadow: inset 0 0 0 1px var(--accent-border);
+  }
+
+  main { padding: 32px 32px 64px; }
+  h1 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 20px; }
+  .card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 32px;
+  }
+  .label { font-size: 0.8125rem; color: var(--text-3); line-height: 1.5; }
+  .row { margin-bottom: 16px; }
+
+  .btn {
+    font-family: inherit; font-size: 0.9375rem; font-weight: 600;
+    color: var(--accent); background: var(--surface-2);
+    border: 1.5px solid var(--accent-border); border-radius: 100px;
+    padding: 10px 22px; cursor: pointer;
+    transition: background 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  }
+  .btn:hover:not(:disabled) { background: var(--accent-ghost); border-color: var(--accent); }
+  .btn.primary {
+    color: #fff; background: var(--accent); border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(26,122,110,0.25);
+  }
+  .btn.primary:hover:not(:disabled) {
+    background: var(--accent-mid); transform: scale(1.02);
+    box-shadow: 0 6px 24px rgba(26,122,110,0.35);
+  }
+  .btn:disabled { opacity: 0.5; cursor: default; box-shadow: none; }
+  .btn.small { font-size: 0.8125rem; padding: 6px 14px; }
+
+  input[type="file"] { font-family: inherit; font-size: 0.9rem; color: var(--text-2); }
+  input[type="text"] {
+    font-family: inherit; font-size: 0.8125rem; color: var(--text-1);
+    padding: 6px 12px; border: 1px solid var(--border); border-radius: 100px;
+    width: 160px; background: var(--bg);
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+
+  .pill {
+    font-size: 0.75rem; font-weight: 600; padding: 3px 12px;
+    border-radius: 100px; white-space: nowrap;
+  }
+  .pill.pending    { background: var(--border); color: var(--text-3); }
+  .pill.confirmed  { background: rgba(26,122,110,0.12); color: var(--accent); }
+  .pill.overridden { background: var(--danger-ghost); color: var(--danger); }
+
+  .error { color: var(--danger); font-size: 0.9rem; }
+  .hidden { display: none; }
+  #result { margin-top: 16px; }
+  #result p + p { margin-top: 4px; }
+  .result-img {
+    max-width: 280px; border-radius: var(--radius);
+    border: 1px solid var(--border); display: block; margin-bottom: 12px;
+  }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  th {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-3);
+  }
+  td { font-size: 0.875rem; color: var(--text-2); }
+  img.thumb { width: 72px; border-radius: 8px; display: block; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; }
+  .stat-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 24px;
+  }
+  .stat-rule { width: 32px; height: 2px; background: var(--accent); border-radius: 2px; margin-bottom: 16px; }
+  .stat-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+  .stat-label { font-size: 0.8125rem; color: var(--text-3); font-weight: 500; }
+
+  .footer-note {
+    padding: 20px 32px; border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--text-3); text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#upload" class="nav-logo" id="logo">Chest X-Ray <span>Image Triage</span></a>
+    <div class="nav-links">
+      <a href="#upload" id="nav-upload">Upload</a>
+      <a href="#cases" id="nav-cases">Cases</a>
+      <a href="#stats" id="nav-stats">Stats</a>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+  <section id="view-upload">
+    <h1>Upload a chest X-ray</h1>
+    <div class="card">
+      <p class="row">
+        <input type="file" id="file" accept="image/*">
+        <span class="label" id="file-name"></span>
+      </p>
+      <p class="row"><button class="btn primary" id="run" disabled>Run prediction</button></p>
+      <p class="label" id="model-status">
+        The model is still loading, the button turns on when it is ready.
+      </p>
+      <div id="result"></div>
+    </div>
+  </section>
+
+  <section id="view-cases" class="hidden">
+    <h1>Cases</h1>
+    <div class="card"><div id="cases-body"></div></div>
+  </section>
+
+  <section id="view-stats" class="hidden">
+    <h1>Stats</h1>
+    <div class="stats-grid" id="stats-body"></div>
+  </section>
+
+</main>
+
+<footer class="footer-note">
+  Demo only. This is not a medical device.
+</footer>
+
+<script>
+const views = ["upload", "cases", "stats"];
+
+function show(name) {
+  views.forEach(v => {
+    document.getElementById("view-" + v).classList.toggle("hidden", v !== name);
+    document.getElementById("nav-" + v).classList.toggle("active", v === name);
+  });
+  if (name === "cases") loadCases();
+  if (name === "stats") loadStats();
+}
+
+views.forEach(v => {
+  document.getElementById("nav-" + v).addEventListener("click", e => {
+    e.preventDefault();
+    location.hash = v;
+    show(v);
+  });
+});
+
+document.getElementById("logo").addEventListener("click", e => {
+  e.preventDefault();
+  location.hash = "upload";
+  show("upload");
+});
+
+async function api(path, options) {
+  const res = await fetch(path, options);
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || ("Request failed: " + res.status));
+  return body;
+}
+
+// Upload screen
+const runBtn = document.getElementById("run");
+const fileInput = document.getElementById("file");
+
+fileInput.addEventListener("change", () => {
+  document.getElementById("file-name").textContent =
+    fileInput.files.length ? fileInput.files[0].name : "";
+});
+
+// The model loads in the background on the server, so poll until it
+// is ready and only then turn the button on.
+async function waitForModel() {
+  const status = document.getElementById("model-status");
+  try {
+    const h = await api("/health");
+    if (h.status === "ready") {
+      runBtn.disabled = false;
+      status.textContent = "";
+      return;
+    }
+    if (h.status === "error") {
+      status.textContent = "The model failed to load: " + h.detail;
+      return;
+    }
+  } catch (err) {
+    // Server not up yet, keep waiting.
+  }
+  setTimeout(waitForModel, 3000);
+}
+waitForModel();
+
+runBtn.addEventListener("click", async () => {
+  const out = document.getElementById("result");
+  out.innerHTML = "";
+  if (!fileInput.files.length) {
+    out.innerHTML = '<p class="error">Pick an image file first.</p>';
+    return;
+  }
+  const form = new FormData();
+  form.append("file", fileInput.files[0]);
+  runBtn.disabled = true;
+  out.innerHTML = "<p>Running the model, please wait...</p>";
+  try {
+    const c = await api("/predict", { method: "POST", body: form });
+    const file = c.image_path.split("/").pop();
+    out.innerHTML =
+      '<img class="result-img" src="/uploads/' + file + '" alt="Uploaded X-ray">' +
+      "<p>Prediction: <b>" + c.label + "</b> (" +
+      (c.probability * 100).toFixed(1) + "%)</p>" +
+      "<p class='label'>Case " + c.id + " saved. " +
+      '<a href="#cases" onclick="show(\'cases\'); return false;">' +
+      "Review it on the Cases page</a>.</p>";
+  } catch (err) {
+    out.innerHTML = '<p class="error">' + err.message + "</p>";
+  }
+  runBtn.disabled = false;
+});
+
+// Cases screen
+async function loadCases() {
+  const body = document.getElementById("cases-body");
+  try {
+    const data = await api("/cases?limit=50");
+    if (!data.cases.length) {
+      body.innerHTML = "<p>No cases yet.</p>";
+      return;
+    }
+    let html = "<table><tr>" +
+      "<th>Id</th><th>Time</th><th>Image</th><th>Prediction</th>" +
+      "<th>Probability</th><th>Status</th><th>Review</th></tr>";
+    data.cases.forEach(c => {
+      const file = c.image_path.split("/").pop();
+      const status = '<span class="pill ' + c.review_status + '">' +
+        c.review_status + "</span>";
+      const review = c.review_status === "pending"
+        ? '<input type="text" id="note-' + c.id + '" placeholder="optional note"> ' +
+          '<button class="btn small" onclick="review(' + c.id + ', \'confirmed\')">Confirm</button> ' +
+          '<button class="btn small" onclick="review(' + c.id + ', \'overridden\')">Override</button>'
+        : (c.review_note || "");
+      html += "<tr>" +
+        "<td>" + c.id + "</td>" +
+        '<td class="label">' + c.created_at.slice(0, 19).replace("T", " ") + "</td>" +
+        '<td><a href="/uploads/' + file + '" target="_blank">' +
+          '<img class="thumb" src="/uploads/' + file + '"></a></td>' +
+        "<td>" + c.label + "</td>" +
+        "<td>" + (c.probability * 100).toFixed(1) + "%</td>" +
+        "<td>" + status + "</td>" +
+        "<td>" + review + "</td></tr>";
+    });
+    body.innerHTML = html + "</table>";
+  } catch (err) {
+    body.innerHTML = '<p class="error">' + err.message + "</p>";
+  }
+}
+
+async function review(id, decision) {
+  const note = document.getElementById("note-" + id).value || null;
+  try {
+    await api("/cases/" + id + "/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ decision: decision, note: note }),
+    });
+    loadCases();
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+// Stats screen
+function statCard(value, label) {
+  return '<div class="stat-card"><div class="stat-rule"></div>' +
+    '<div class="stat-value">' + value + "</div>" +
+    '<div class="stat-label">' + label + "</div></div>";
+}
+
+async function loadStats() {
+  const body = document.getElementById("stats-body");
+  try {
+    const s = await api("/stats");
+    const acc = s.accuracy === null
+      ? "n/a"
+      : (s.accuracy * 100).toFixed(1) + "%";
+    body.innerHTML =
+      statCard(s.total, "Total cases") +
+      statCard(s.pending, "Pending review") +
+      statCard(s.confirmed, "Confirmed") +
+      statCard(s.overridden, "Overridden") +
+      statCard(acc, "Agreement (confirmed out of all reviewed)");
+  } catch (err) {
+    body.innerHTML = '<p class="error">' + err.message + "</p>";
+  }
+}
+
+const start = location.hash.slice(1);
+show(views.includes(start) ? start : "upload");
+</script>
+
+</body>
+</html>

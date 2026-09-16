@@ -1,0 +1,24 @@
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Runtime data (may contain uploaded medical images)
+triage.db
+*.sqlite3
+uploads/
+
+# Editor files
+.idea/
+.vscode/

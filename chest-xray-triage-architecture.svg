@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2712" height="1418" viewBox="0 0 2712 1418" role="img" aria-labelledby="title description">
+<title id="title">Chest X-ray Triage</title>
+<desc id="description">Architecture and request flow. A background thread loads the packaged model at startup. Once ready, the browser uploads an image. FastAPI validates the image, then the CPU pipeline preprocesses and classifies it. The image and pending case are saved persistently. A JSON response and preview return to the browser, a physician confirms or overrides the result, and statistics report counts and physician/model agreement. HTTP 503, 400 and 422 are conditional error outcomes. Model weights are fetched from Hugging Face Hub only at Docker build time.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 20 18" refX="18" refY="9" markerWidth="20" markerHeight="18" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L18 9 L1 17 Z" fill="#11756E"/></marker>
+</defs>
+<rect width="2712" height="1418" fill="#F6F8F8"/>
+<g font-family="Arial, Helvetica, Nimbus Sans, sans-serif">
+
+<text x="96" y="107" font-size="58" font-weight="700" fill="#14292F" letter-spacing="-1.5">Chest X-ray Triage</text>
+<text x="96" y="158" font-size="28" font-weight="400" fill="#64747A" >Image upload, model inference, persistent cases and physician review.</text>
+<line x1="96" y1="199" x2="2616" y2="199" stroke="#11756E" stroke-width="1.5"/>
+<rect x="72" y="234" width="792" height="1058" rx="22" fill="#EDF2F2"/>
+<text x="96" y="279" font-size="23" font-weight="700" fill="#11756E" letter-spacing="1.6">UPLOAD &amp; VALIDATION</text>
+<line x1="96" y1="300" x2="840" y2="300" stroke="#CBD6D8" stroke-width="1.5"/>
+<rect x="960" y="234" width="792" height="1058" rx="22" fill="#EDF2F2"/>
+<text x="984" y="279" font-size="23" font-weight="700" fill="#11756E" letter-spacing="1.6">INFERENCE &amp; STORAGE</text>
+<line x1="984" y1="300" x2="1728" y2="300" stroke="#CBD6D8" stroke-width="1.5"/>
+<rect x="1848" y="234" width="792" height="1058" rx="22" fill="#EDF2F2"/>
+<text x="1872" y="279" font-size="23" font-weight="700" fill="#11756E" letter-spacing="1.6">PHYSICIAN REVIEW &amp; STATISTICS</text>
+<line x1="1872" y1="300" x2="2616" y2="300" stroke="#CBD6D8" stroke-width="1.5"/>
+<g class="edge" data-from="startup" data-to="upload"><path d="M468 554 V648" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="upload" data-to="validate"><path d="M468 914 V1008" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="validate" data-to="inference"><path d="M840 1134 H896 Q912 1134 912 1118 V798 Q912 782 928 782 H982" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="build" data-to="inference"><path d="M1356 554 V648" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)" stroke-dasharray="9 7"/></g>
+<g class="edge" data-from="inference" data-to="persist"><path d="M1356 914 V1008" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="persist" data-to="response"><path d="M1728 1134 H1784 Q1800 1134 1800 1118 V457 Q1800 441 1816 441 H1870" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="response" data-to="review"><path d="M2244 554 V648" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<g class="edge" data-from="review" data-to="stats"><path d="M2244 914 V1008" fill="none" stroke="#11756E" stroke-width="3" stroke-linejoin="round" marker-end="url(#arrow)"/></g>
+<text x="1380" y="608" font-size="18" font-weight="700" fill="#11756E" letter-spacing="0.8">BUILD-TIME WEIGHTS</text>
+<g class="node" id="startup"><title>Load the model at startup</title>
+<rect x="96" y="328" width="744" height="226" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<text x="124" y="382" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Load the model at startup</text>
+<text x="124" y="430" font-size="26" font-weight="400" fill="#64747A" >model.py · background loader thread</text>
+<text x="124" y="464" font-size="26" font-weight="400" fill="#64747A" >GET /health: loading → ready</text>
+<text x="124" y="498" font-size="26" font-weight="400" fill="#64747A" >Upload button disabled until ready</text>
+</g>
+<g class="node" id="build"><title>Package the model at build time</title>
+<rect x="984" y="328" width="744" height="226" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<text x="1012" y="382" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Package the model at build time</text>
+<text x="1012" y="430" font-size="26" font-weight="400" fill="#64747A" >Hugging Face Hub → Docker image</text>
+<text x="1012" y="464" font-size="26" font-weight="400" fill="#64747A" >Weights fetched once at build time (~350 MB)</text>
+<text x="1012" y="511" font-size="23" font-weight="400" fill="#64747A" font-family="DejaVu Sans Mono, monospace">nickmuchi/vit-finetuned-chest-xray-pneumonia</text>
+</g>
+<g class="node" id="response"><title>Return the case to the browser</title>
+<rect x="1872" y="328" width="744" height="226" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<text x="1900" y="382" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Return the case to the browser</text>
+<text x="1900" y="430" font-size="26" font-weight="400" fill="#64747A" >Case JSON returned · image preview shown</text>
+<text x="1900" y="464" font-size="26" font-weight="400" fill="#64747A" >GET /uploads/&lt;file&gt; · saved X-ray image</text>
+<text x="1900" y="498" font-size="26" font-weight="400" fill="#64747A" >GET /cases · browse case records</text>
+</g>
+<g class="node" id="upload"><title>Upload an image</title>
+<rect x="96" y="650" width="744" height="264" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<circle cx="136" cy="694" r="18" fill="#11756E"/>
+<text x="136" y="701" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="174" y="704" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Upload an image</text>
+<text x="124" y="752" font-size="26" font-weight="400" fill="#64747A" >Browser · static/index.html</text>
+<text x="124" y="786" font-size="26" font-weight="400" fill="#64747A" >Single-page UI: Upload / Cases / Stats</text>
+<text x="124" y="820" font-size="26" font-weight="400" fill="#64747A" >POST /predict · image upload</text>
+<rect x="112" y="862" width="712" height="38" rx="8" fill="#FCF4ED"/>
+<text x="124" y="888" font-size="23" font-weight="400" fill="#A35D29" >If still loading → 503 · Model still loading</text>
+</g>
+<g class="node" id="inference"><title>Preprocess and classify</title>
+<rect x="984" y="650" width="744" height="264" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<circle cx="1024" cy="694" r="18" fill="#11756E"/>
+<text x="1024" y="701" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="1062" y="704" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Preprocess and classify</text>
+<text x="1012" y="752" font-size="26" font-weight="400" fill="#64747A" >model.py · PyTorch CPU</text>
+<text x="1012" y="786" font-size="26" font-weight="400" fill="#64747A" >AutoImageProcessor: resize / normalize</text>
+<text x="1012" y="820" font-size="26" font-weight="400" fill="#64747A" >ViT → softmax → label + probability</text>
+<rect x="1000" y="862" width="712" height="38" rx="8" fill="#FCF4ED"/>
+<text x="1012" y="888" font-size="23" font-weight="400" fill="#A35D29" >On failure → 422 · Processing failed (logged)</text>
+</g>
+<g class="node" id="review"><title>Review the prediction</title>
+<rect x="1872" y="650" width="744" height="264" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<circle cx="1912" cy="694" r="18" fill="#11756E"/>
+<text x="1912" y="701" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="1950" y="704" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Review the prediction</text>
+<text x="1900" y="752" font-size="26" font-weight="400" fill="#64747A" >Physician reviews the case and image</text>
+<text x="1900" y="786" font-size="26" font-weight="400" fill="#64747A" >POST /cases/:id/review</text>
+<text x="1900" y="820" font-size="26" font-weight="400" fill="#64747A" >Review outcome: confirmed / overridden</text>
+</g>
+<g class="node" id="validate"><title>Validate the image</title>
+<rect x="96" y="1010" width="744" height="248" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<circle cx="136" cy="1054" r="18" fill="#11756E"/>
+<text x="136" y="1061" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="174" y="1064" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Validate the image</text>
+<text x="124" y="1112" font-size="26" font-weight="400" fill="#64747A" >FastAPI · main.py</text>
+<text x="124" y="1146" font-size="26" font-weight="400" fill="#64747A" >PIL validates that the file is an image</text>
+<rect x="112" y="1206" width="712" height="38" rx="8" fill="#FCF4ED"/>
+<text x="124" y="1232" font-size="23" font-weight="400" fill="#A35D29" >If invalid → 400 · Not an image</text>
+</g>
+<g class="node" id="persist"><title>Save the image and case</title>
+<rect x="984" y="1010" width="744" height="248" rx="16" fill="#FFFFFF" stroke="#DFE5E6" stroke-width="1.6"/>
+<circle cx="1024" cy="1054" r="18" fill="#11756E"/>
+<text x="1024" y="1061" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="1062" y="1064" font-size="30" font-weight="700" fill="#14292F" letter-spacing="-0.45">Save the image and case</text>
+<text x="1012" y="1112" font-size="26" font-weight="400" fill="#64747A" >Persistent volume: triage-data</text>
+<text x="1012" y="1146" font-size="26" font-weight="400" fill="#64747A" >Save image as uploads/&lt;uuid&gt;.png</text>
+<text x="1012" y="1180" font-size="26" font-weight="400" fill="#64747A" >db.py / sqlite3 → triage.db · cases table</text>
+<text x="1012" y="1214" font-size="26" font-weight="400" fill="#64747A" >INSERT case row · status: pending</text>
+</g>
+<g class="node" id="stats"><title>View review statistics</title>
+<rect x="1872" y="1010" width="744" height="248" rx="16" fill="#E8F2F0" stroke="#11756E" stroke-width="1.8"/>
+<circle cx="1912" cy="1054" r="18" fill="#11756E"/>
+<text x="1912" y="1061" font-size="21" font-weight="700" fill="#FFFFFF" text-anchor="middle">6</text>
+<text x="1950" y="1064" font-size="30" font-weight="700" fill="#11756E" letter-spacing="-0.45">View review statistics</text>
+<text x="1900" y="1112" font-size="26" font-weight="400" fill="#64747A" >GET /stats</text>
+<text x="1900" y="1146" font-size="26" font-weight="400" fill="#64747A" >Case counts</text>
+<text x="1900" y="1180" font-size="26" font-weight="400" fill="#64747A" >Physician/model agreement</text>
+</g>
+<line x1="96" y1="1330" x2="2616" y2="1330" stroke="#CBD6D8" stroke-width="1.5"/>
+<text x="96" y="1376" font-size="25" font-weight="400" fill="#64747A" >Deployment: FastAPI runs in Docker on Uvicorn port 8000. Images and case records persist in the triage-data volume.</text>
+</g></svg>

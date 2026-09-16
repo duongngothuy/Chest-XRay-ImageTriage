@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Keep the database and uploads in one folder so they can persist.
+      TRIAGE_DB: /app/data/triage.db
+      UPLOAD_DIR: /app/data/uploads
+    volumes:
+      - triage-data:/app/data
+
+volumes:
+  triage-data:
