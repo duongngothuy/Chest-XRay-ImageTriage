@@ -47,6 +47,14 @@ background, so wait for the health check to say "ready" before uploading.
 - Cases: every past prediction, with confirm and override buttons.
 - Stats: simple counts and how often the human agreed with the model.
 
+### Upload
+
+![Chest X-ray upload and prediction screen](demo-upload.png)
+
+### Cases
+
+![Chest X-ray case review screen](demo-cases.png)
+
 ## API routes and curl examples
 
 Run a prediction on an image file:
